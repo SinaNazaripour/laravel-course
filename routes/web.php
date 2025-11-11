@@ -4,6 +4,7 @@ use App\Http\Controllers\InvokableController;
 use App\Http\Controllers\PhotoCommentsController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ViewController;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
@@ -190,4 +191,10 @@ Route::get('/invokable-controller', InvokableController::class); #artisan make:c
 // |----------------------
 // |----nasted resources
 // |----------------------
-Route::resource('photo.comments', PhotoCommentsController::class);#php artisan make:controller PhotoCommentsController  --resource
+Route::resource('photo.comments', PhotoCommentsController::class); #php artisan make:controller PhotoCommentsController  --resource
+
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------
+// |----------------------
+// |----views
+// |----------------------
+Route::get('/view', [ViewController::class, 'basics']);
