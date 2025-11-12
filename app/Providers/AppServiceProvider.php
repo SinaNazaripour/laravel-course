@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\View\Composers\TestComposer;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -35,5 +37,14 @@ class AppServiceProvider extends ServiceProvider
 
 
         });
+
+        // ----------------view composer------------
+
+        // View::composer(['test.views.composertest'], TestComposer::class); #=>['*'] for all blade templates in first array arg
+
+        // so like routes wwe can use closures!
+        View::composer(['test.views.composertest'], function ($view) {
+            $view->with('datakey', 'closue');
+        }); #=>['*'] for all blade templates in first array arg
     }
 }

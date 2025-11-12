@@ -1,0 +1,3 @@
+<div>
+    {{$fromClassComponent}}
+</div>

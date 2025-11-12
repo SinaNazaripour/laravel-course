@@ -25,3 +25,30 @@ echo 'we can also use php tag';
 @guest
     <h2>guest mode</h2>
 @endguest
+
+@env('local')
+    <h1>project on local</h1>
+@endenv
+
+@env('production')
+    <h1>project on production</h1>
+@endenv
+
+@if (1 == 2)
+@endif
+
+@php
+    $users = ['Ali', 'MMd', 'Reza'];
+@endphp
+
+<ul>
+    @foreach ($users as $user)
+        {{-- @continue($user=='Reza') --}}
+        <li>{{ $user }}</li>
+        {{-- @break($user=='Ali') --}}
+    @endforeach
+</ul>
+
+@for ($i = 0; $i < 12; $i++)
+    {{ $i }}
+@endfor

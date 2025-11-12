@@ -195,6 +195,35 @@ Route::resource('photo.comments', PhotoCommentsController::class); #php artisan 
 
 // -------------------------------------------------------------------------------------------------------------------------------------------------------------
 // |----------------------
-// |----views
+// |----views and directives
 // |----------------------
 Route::get('/view', [ViewController::class, 'basics']);
+
+// |----------------------
+// |----Work With html&css
+// |----------------------
+Route::get('/view/work-with-html', [ViewController::class, 'workwithhtml']);
+
+
+// |----------------------
+// |----View composers
+// |----------------------
+
+Route::get('/view/composer', [ViewController::class, 'composer']);
+
+
+// |----------------------
+// |----ananymous components
+// |----------------------
+
+Route::get('/view/ananymous-components', [ViewController::class, 'ananymousComponents']);
+
+// |----------------------
+// |----class based components
+// |----------------------
+Route::get('/view/class-components', [ViewController::class, 'classComponents']);
+
+// |----------------------
+// |----component based layouts
+// |----------------------
+Route::get('/view/class-component-layout', [ViewController::class, 'componentBasedLayout']);
