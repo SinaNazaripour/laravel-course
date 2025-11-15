@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ExampleInterface;
 use Illuminate\Http\Request;
 
 class PhotoController extends Controller
 {
+    public function __construct(public ExampleInterface $service) {}
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        echo "from photo controller <br>";
+        return $this->service->implementMethod();
     }
 
     /**

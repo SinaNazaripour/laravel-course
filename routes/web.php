@@ -6,10 +6,14 @@ use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ViewController;
 use App\Models\User;
+use App\Services\ExampleInterface;
+use App\Services\ExampleService1;
+use App\Services\NotificationDispatcher;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Psy\Command\DumpCommand;
 use Symfony\Component\HttpFoundation\Request;
 
 Route::get('/', function () {
@@ -226,4 +230,50 @@ Route::get('/view/class-components', [ViewController::class, 'classComponents'])
 // |----------------------
 // |----component based layouts
 // |----------------------
-Route::get('/view/class-component-layout', [ViewController::class, 'componentBasedLayout']);
+Route::get('/view/component-layout', [ViewController::class, 'componentBasedLayout']);
+
+// |----------------------
+// |----inherit based layouts
+// |----------------------
+Route::get('/view/inherit-layout', [ViewController::class, 'inheritBasedLayout']);
+
+
+// |----------------------
+// |----service providers
+// |----------------------
+// services that have Typehint dependencies are handled auto but for manuall dependecy look at Exaple service provider.php
+Route::get('/service-providers', function (ExampleService1 $service) {
+    return $service->serviceOneMethod();
+});
+
+// |----------------------
+// |---- singleton
+// |---------------------
+// to aviod  make an instance frequent in one request we user singleton method instead bind in register method in Sprovider
+Route::get('/service-providers/singleton', function (ExampleService1 $service) {
+    $r = app(ExampleService1::class);
+    dump($r->serviceOneMethod());
+    return $service->serviceOneMethod();
+});
+
+// |----------------------
+// |---- interface binding
+// |---------------------
+Route::get('/service-providers/interface-binding', function (ExampleInterface $service) {
+    return $service->implementMethod();
+});
+
+
+// |----------------------
+// |----binding interfaces in runtime
+// |---------------------
+Route::get('/service-providers/interface-binding-at-runtime', [PhotoController::class, 'index']); #goto ExampleService provider
+
+
+// |----------------------
+// |----tagged bindings
+// |---------------------
+
+Route::get('/service-providers/tagged-binding/{message}', function (NotificationDispatcher $service, $message) {
+    return $service->sendNotification($message);
+});#goto ExampleService provider

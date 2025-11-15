@@ -35,4 +35,9 @@ class ViewController extends Controller
     {
         return view('test.views.include-component-layout');
     }
+
+    public function inheritBasedLayout()
+    {
+        return view('test.views.include-inherit-layout');
+    }
 }
