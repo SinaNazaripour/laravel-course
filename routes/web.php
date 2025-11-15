@@ -12,6 +12,7 @@ use App\Services\NotificationDispatcher;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Psy\Command\DumpCommand;
 use Symfony\Component\HttpFoundation\Request;
@@ -238,7 +239,7 @@ Route::get('/view/component-layout', [ViewController::class, 'componentBasedLayo
 Route::get('/view/inherit-layout', [ViewController::class, 'inheritBasedLayout']);
 
 
-// |----------------------
+// |-----------------------------------------------------------------------------------------------------------------------
 // |----service providers
 // |----------------------
 // services that have Typehint dependencies are handled auto but for manuall dependecy look at Exaple service provider.php
@@ -276,4 +277,23 @@ Route::get('/service-providers/interface-binding-at-runtime', [PhotoController::
 
 Route::get('/service-providers/tagged-binding/{message}', function (NotificationDispatcher $service, $message) {
     return $service->sendNotification($message);
-});#goto ExampleService provider
+}); #goto ExampleService provider
+// ------------------------------------------------------------------------------------------------------------------------
+
+// |-----------------------------------------------------------------------------------------------------------------------
+// |---- facades
+// |----------------------
+// once way-------------------------->
+Route::get('/facades', function () {
+    // return Response::json(['first way' => 'illuminate\support\facades\felan']);
+    // return response()->json(['secound way' => 'laravel helper functions']);
+    dd(app('hash')); #third way from app service container
+});
+
+// |----------------------
+// |----contracts
+// |---------------------
+Route::get('/contracts', function (Illuminate\Contracts\Routing\ResponseFactory $response) {
+    //    with contracts interfaces and dipendency injection 
+    return  $response->json(['contract' => 'object']);
+});

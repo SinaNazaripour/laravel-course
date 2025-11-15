@@ -14,6 +14,9 @@ class ExampleProvider extends ServiceProvider #implements DeferrableProvider
      */
     public function register(): void
     {
+        // |----------------------
+        // |---- binding unresolved dependencies
+        // |---------------------
         // $this->app->bind(ExampleService1::class, function () {
         //     return new ExampleService1($this->app->make(ExampleService2::class));
         // });
