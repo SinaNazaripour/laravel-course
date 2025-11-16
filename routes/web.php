@@ -3,8 +3,11 @@
 use App\Http\Controllers\InvokableController;
 use App\Http\Controllers\PhotoCommentsController;
 use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\TestMwController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ViewController;
+use App\Http\Middleware\BeforeAfterMiddleware;
+use App\Http\Middleware\ExampleMiddleware;
 use App\Models\User;
 use App\Services\ExampleInterface;
 use App\Services\ExampleService1;
@@ -297,3 +300,44 @@ Route::get('/contracts', function (Illuminate\Contracts\Routing\ResponseFactory 
     //    with contracts interfaces and dipendency injection 
     return  $response->json(['contract' => 'object']);
 });
+
+// |-----------------------------------------------------------------------------------------------------------------------
+// |---- middleware
+// |----------------------
+Route::get('/middleware', function () {
+    return " page is verified by midlleware!";
+})->middleware(ExampleMiddleware::class);
+
+// |----------------------
+// |----apply globally middleware
+// |---------------------
+// not for any single route, but for all ! open app.php in bootstrap in middleware function $middleware->append(MyMiddleware::class) 
+
+// |----------------------
+// |----before and after request handling
+// |----------------
+
+Route::get('/before-after', function () {
+    echo "request handeled<br>";
+    return " response returned";
+})->middleware(BeforeAfterMiddleware::class);
+
+// |----------------------
+// |----define middleware in controlle with implementing hasmiddleware interface
+// |----------------
+Route::resource('/middleware-in-controller', TestMwController::class);
+
+// |----------------------
+// |----alias and parameter for made middWs
+// |----------------
+Route::get('/middleware-alias-parameter', function () {
+    return "page content";
+})->middleware('aliastest.midlleware:ali');
+
+
+// |----------------------
+// |----deactivation default middlewares 
+// |----------------
+Route::post('/without-csrf', function () {
+    return "dontverifaied csrf mw";
+})->withoutMiddleware([Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
