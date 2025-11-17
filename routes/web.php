@@ -446,4 +446,9 @@ Route::post('request/file', function (Request $request) {
     // __________________save old data for redirection as failedvalidatio______
 
     // $name = $request->old('name');
+    // redirectTo()->withInput()
+
+    // ________________________________read cookies____________________________
+    // dump($request->coockie('laravel_session'))
+
 })->withoutMiddleware([Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);;
