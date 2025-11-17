@@ -12,13 +12,15 @@ use App\Models\User;
 use App\Services\ExampleInterface;
 use App\Services\ExampleService1;
 use App\Services\NotificationDispatcher;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
+
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Psy\Command\DumpCommand;
-use Symfony\Component\HttpFoundation\Request;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -341,3 +343,107 @@ Route::get('/middleware-alias-parameter', function () {
 Route::post('/without-csrf', function () {
     return "dontverifaied csrf mw";
 })->withoutMiddleware([Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
+
+
+//                   <---------------------------------Requests------------------------------------->
+
+// |----------------------
+// |----RequestBasics 
+// |----------------
+
+Route::match(['get', 'post'], '/request/basics', function (Request $request) {
+
+    // -check request method
+
+    if ($request->isMethod('get')) {
+        dump("this is get request");
+    }
+    //  request path
+    if ($request->is('request/*')) { #for pattern of route path
+
+        //  request path
+        dump($request->path());
+
+        // route name check
+        dump($request->routeIs("request.*") ? 'route name is match' : 'no');
+
+        // url without qurey string
+        dump($request->url());
+
+        // full url 
+        dump($request->fullUrl());
+
+        // for speceific parameter
+        dump($request->query('a', 'defaul'));
+    }
+})->name('request.basics');
+
+// |----------------------
+// |----Request Accept headers 
+// |----------------
+Route::match(['get', 'post'], 'request/accept-header', function (Request $request) {
+    // if ($request->accepts(['text/html'])) {
+    //     dump("request header is text/html:" . $request->path());
+    // } elseif ($request->accepts(['application/json'])) {
+    //     return response()->json(["message" => "request header is application/json:" . $request->path()]);
+    // }
+
+    // ----------------when application expects to give json
+
+    if ($request->expectsJson()) {
+        return response()->json(["message" => "request header is application/json:" . $request->path()]);
+    }
+});
+
+
+// |----------------------
+// |----Token & headers 
+// |----------------
+Route::post('request/header-and-token', function (Request $request) {
+    return response()->json([
+        'token' => $request->bearerToken(),
+        'header:param' => $request->header('param')
+
+    ]);
+})->withoutMiddleware([Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
+
+
+// |----------------
+// |----form & json inputs reading 
+// |----------------
+
+Route::post("request/input-test", function (Request $request) {
+    if ($request->expectsJson()) {
+        dump($request->input('user.name'));
+    } elseif ($request->accepts(['text/html'])) {
+        // dump($request->input('name'));
+
+        // to see bool of a field
+        dump($request->boolean('ok'));
+        // to see a field exists
+        dump($request->has('paramname'));
+        // you may know this 
+        dump($request->except('paramname'));
+    }
+})->withoutMiddleware([Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
+
+// |----------------
+// |----uploaded file reading and store 
+// |----------------
+
+Route::post('request/file', function (Request $request) {
+    // property of file
+    $name = $request->file('photo')->getClientOriginalName();
+    // $type=$request->file('photo')->getClientMimeType()
+    // $extension=$request->file('photo')->getClientOriginalExtension()
+    // $name=$request->file('photo')->getClientOriginalPath()
+
+    // __________storage________
+    // $path = $request->photo->store('images');
+    $path = $request->file('photo')->store('images');
+    return $path;
+
+    // __________________save old data for redirection as failedvalidatio______
+
+    // $name = $request->old('name');
+})->withoutMiddleware([Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);;

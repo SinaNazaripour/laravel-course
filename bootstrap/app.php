@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         //adding global middleware
-        $middleware->append(SayHelloMiddleware::class);
+        // $middleware->append(SayHelloMiddleware::class);
         $middleware->alias([
             'aliastest.midlleware' => AliasParamsMiddleware::class
         ]);
