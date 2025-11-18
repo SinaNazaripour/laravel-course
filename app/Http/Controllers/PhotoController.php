@@ -38,7 +38,7 @@ class PhotoController extends Controller
      */
     public function show(string $id)
     {
-        //
+        return "photo with id => {$id}";
     }
 
     /**

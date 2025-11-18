@@ -22,9 +22,9 @@ use Illuminate\Support\Facades\Route;
 use Psy\Command\DumpCommand;
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/home/{name?}', function ($name) {
+    return view('welcome')->with('name', $name);
+})->name('home');
 
 Route::get('/route-prarmeter-optional/{name}/{id?}', function ($name, $id = null) {
     return "hello $name:$id";
@@ -427,9 +427,7 @@ Route::post("request/input-test", function (Request $request) {
     }
 })->withoutMiddleware([Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
 
-// |----------------
-// |----uploaded file reading and store 
-// |----------------
+
 
 Route::post('request/file', function (Request $request) {
     // property of file
@@ -452,3 +450,97 @@ Route::post('request/file', function (Request $request) {
     // dump($request->coockie('laravel_session'))
 
 })->withoutMiddleware([Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);;
+
+
+
+// |-----------------------------------------------------------------------------------
+// |----Responses!
+// |----------------
+
+Route::get('responser/{user?}', function (Request $request, User $user) {
+
+    // by defaul its going to be json response
+    // return ['name' => 1];
+    // return $user
+
+    #and also we can use response->json function
+
+    return response()->json(
+        [
+            'name' => 'sina',
+            'soldure' => 'false'
+        ]
+    );
+});
+
+// |----------------
+// |----after reading cookie and header from request we have to write this from respons 
+// |----------------
+
+Route::prefix('response')->group(function () {
+    Route::get(
+        'coockie-header',
+        function (Request $request) {
+            #write cookie
+            // return response('felan')->cookie(
+            //     'name',
+            //     'value',
+            //     // $minutes,
+            //     // $path,
+            //     // $domain,
+            //     // $secure,
+            //     // httpOnly
+
+            // );
+            #delete cookie
+            return response('bobo')->withoutCookie('name');
+            #header
+            return response('reza', 200)->header('melika', 'reza');
+            #send header fstr
+            // return response(null, 200, ["header" => "this is header fast way"]);
+            // return "ok";
+        }
+    );
+    // |----------------
+    // |----redirection responses
+    // |----------------
+    Route::get('redirection', function () {
+
+        // -----------------externall path---------------------
+        // return redirect()->away('https://www.google.com');
+
+        // ----------------named simple redirection----------
+        // return redirect('welcome');
+
+        // ----------------named with argument redirection----------
+        return redirect()->route('home', ['name' => 'rezo']);
+
+            // ----------------named with controller method redirection----------
+            // return redirect()->action([PhotoController::class, "show"], ['photo' => 1]);
+
+        ;
+
+        //     // ---------------------------for flash messages and inputes to faild form_______
+        // ----------------more-------------
+
+        // return redirect('home')->with('sessionname', 'value');
+        // ->in method $request->session()->get('name')
+
+        //     return back()
+        //     redirect('felan')->withInput($request->except('password'));
+        //     back()->withInput($request->except('password'));
+    });
+
+
+    // |----------------
+    // |----download files (sending a file to client )
+    // |----------------
+
+    Route::get('download', function () {
+        //---------downloads-----------
+        return response()->download(storage_path('app\private\images\rwQowNHp0d8imW683RNIOzTPMkdkgFrm6z5LzCrp.png'));
+
+        // -------views-------
+        // return response()->file(storage_path('app\private\images\rwQowNHp0d8imW683RNIOzTPMkdkgFrm6z5LzCrp.png'));
+    });
+});
