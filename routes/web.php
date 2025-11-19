@@ -13,6 +13,7 @@ use App\Services\ExampleInterface;
 use App\Services\ExampleService1;
 use App\Services\NotificationDispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
@@ -543,4 +544,52 @@ Route::prefix('response')->group(function () {
         // -------views-------
         // return response()->file(storage_path('app\private\images\rwQowNHp0d8imW683RNIOzTPMkdkgFrm6z5LzCrp.png'));
     });
+});
+
+// |-----------------------------------------------------------------------------------
+// |----Session intrupt
+// |----------------
+
+Route::get('/session', function (Request $request) {
+    // -------read from session---------
+    dump($request->session()->get("key", 'default'));
+
+    // -------write session---------
+    $request->session()->put("key", 'value');
+
+    // -------forget session---------
+    // $request->session()->forget("key");
+
+
+    // --------------pop from session----------
+    // $value = $request->session()->pull("key");
+
+
+    // -----------clear entire session---------
+    // $request->session()->flush();
+
+    // ---------------------set session only for next request-------
+    // $request->session()->flash('key','value');
+
+    // ---------------check session------------
+    dump($request->session()->has('key'));
+    dump($request->session()->exists('key'));
+});
+
+// |-----------------------------------------------------------------------------------
+// |----configuration
+// |----------------
+Route::get('/configuration', function () {
+    dump(App::environment());
+    // ------------------read config files----------
+    dump(config("app.locale", "default"));
+    dump(config("app.timezone", "default"));
+    // -------------------set config at runtime (temporary not permanent)
+    config(['app.timezone' => 'Asia/tehran']);
+    dump(config("app.timezone", "default"));
+
+    //------------use it conditionally-----
+    if (App::environment(['local', 'staging'])) {
+        return "in dev mode";
+    }
 });
