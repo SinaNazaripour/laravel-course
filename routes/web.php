@@ -17,11 +17,16 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
-
+use Illuminate\support\Arr;
+use Illuminate\Support\Benchmark;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Lottery;
+use Illuminate\Support\Number;
 use Psy\Command\DumpCommand;
+use Ramsey\Collection\Collection;
 
+use Illuminate\Support\Str;
 
 Route::get('/home/{name?}', function ($name) {
     return view('welcome')->with('name', $name);
@@ -592,4 +597,171 @@ Route::get('/configuration', function () {
     if (App::environment(['local', 'staging'])) {
         return "in dev mode";
     }
+});
+
+// |-----------------------------------------------------------------------------------
+// |----helper functions and collections
+// |----------------
+
+route::get('/collection', function () {
+    // --------collect function gives an object we can process as array
+    // dump(collect([1, 2, 3, 5, 32])->min());
+    // dump(collect([1, 2, 3, 5, 32])->max());
+    // dump(collect([1, 2, 3, 5, 32])->avg());
+    // dump(collect([1, 2, 3, 5, 32])->sum());
+    // dump(collect([1, 2, 3, 5, 32])->count());
+    // collect([1, 2, 3, 5, 32])->dump();
+    // collect([1, 2, 3, 5, 32])->dd();
+
+    // -------------------operate on collection---------------
+    $collection = collect([1, 2, 3, 4, 5]);
+
+    // -------------------- filter like array_filter()---------
+    $filtered = $collection->filter(function (int $value, int $key) {
+        return $key > 1;
+    });
+    // dump($filtered->all()); #gives normall array not object of collection
+    // dump($filtered); gives  object of collection
+
+    // -------------------- rejects instead filter!---------
+    $rejected = $collection->reject(function (int $value, int $key) {
+        return $key > 1;
+    });
+    // dump($rejected->all()); #gives normall array not object of collection
+    // dump($rejected); #gives  object of collection
+
+    // -------------------- map like array_map()---------
+    $mapped = $collection->map(function (int $value) {
+        return $value + 1;
+    });
+    // // dump($mapped->all()); #gives normall array not object of collection
+    // // dump($mapped); #gives  object of collection
+
+    // ----------transform :like array_map() but doesnt make new collection it changes current collection---------
+    $collection->transform(function (int $item, $key) {
+        return $item * 2;
+    });
+    // dump($collection->all()); #gives normall array not object of collection
+    // // dump($mapped); #gives  object of collection
+
+
+    // ----------each :like foreach---------
+    $each = $collection->each(function (int $item) {
+        echo $item * 2;
+    });
+    // dump($each->all()); #gives normall array not object of collection
+    // // dump($mapped); #gives  object of collection
+});
+
+
+// |----------------
+// |--sorting--chunk
+// |----------------
+
+Route::get('collection/sort-chunk/{chunk?}', function (int $chunk = 2) {
+    $products = collect([
+        ['id' => 1, 'name' => 'pink', 'price' => '100'],
+        ['id' => 2, 'name' => 'red', 'price' => '150'],
+        ['id' => 3, 'name' => 'brown', 'price' => '70'],
+        ['id' => 4, 'name' => 'black', 'price' => '30'],
+    ])->sortBy('price'); # many functions are like sort or sortByDesc and in use you'll learn it.
+    // dump($products->all());
+
+    return view('test.views.chunk', ['products' => $products, "chunk" => $chunk]);
+});
+
+// |----------------
+// |----HELPERS!
+// |----------------
+Route::get('/helpers', function () {
+    // path helpers is known by names
+    dump(public_path('css\felan')); #pulic folder and we can also complete this as argument
+    dump(app_path('felan')); #app folder and we can also complete this as argument
+    dump(base_path('felan')); #root folder and we can also complete this as argument
+    dump(config_path('felan')); #config folder and we can also complete this as argument
+    dump(storage_path('felan')); #storage folder and we can also complete this as argument
+
+    // link heplers
+
+    dump(action([ViewController::class, 'basics'], ['param' => 'ok']));
+
+    dump(asset(('file.jpg'))); #uses in view files
+
+    dump(route('home', ['name' => 'ali'], $absolute = true)); # like action but for named routes instead controller methods
+
+    dump(url('hali', ['ali'])); # for make a url with params
+    dump(url()->current()); # for current url
+    // dump(url()->full()); # with query string
+});
+
+// |----------------
+// |----Str::helpers
+// |----------------
+
+Route::get('/helpers-string/{text?}', function (string $text = 'sample text') {
+    dump(Str::limit($text, $limit = 5, $end = '  more...')); #to truncate
+    dump(Str::mask($text, $character = '*', $index = -5, $length = 4)); #to mask and hide
+    dump(Str::length($text)); #to mask and hide
+    dump(Str::password($length = 8)); #to make password
+    dump(Str::plural('go')); #to pluralize 
+    dump(Str::singular('')); #to singular
+    dump(Str::slug('go to room')); #to slugify
+    dump(Str::reverse('go to room')); #to slugify
+});
+
+// |----------------
+// |----Miscellaneous::helpers
+// |----------------
+Route::get('/miscellaneous', function () {
+    dump(app());
+    dump(app('App\Services\ExampleService1')->serviceOneMethod()); #to get instance fronm app service container
+
+    // to get current logged in user
+    // dump(auth()->user());
+
+    // to read config files
+    dump(config($key = 'app.timezone', 'default'));
+
+    // to get... from .env
+    dump(env('APP_ENV', 'default'));
+
+    // fake data for test application
+    // dump(fake()->email());
+    // dump(fake()->firefox());
+    // dump(fake()->phoneNumber());
+    // dump(fake('fr_FR')->firstName());
+
+    // translate function
+    dump(__('سلام'));
+
+    // make query string
+    dump(Arr::query([
+        'me' => 'tierd'
+    ]));
+
+    // number for humans
+    dump(Number::forHumans(1230000, precision: 2));
+
+    // now
+    dump(now()->addMinute(3));
+
+    // --htmlform helpers-------
+
+    dump(csrf_field());
+    dump(method_field('delete'));
+
+    // --------benchmark and lottery-------
+    // Benchmark::dd([
+    //     'senario1' => fn() => sleep(2),
+    //     'senario2' => fn() => sleep(1)
+    // ], iterations: 3);
+
+    //  lottery is to make propability
+
+    $chance = Lottery::odds(1, 2)->winner(fn() => 'you won a phone!')->loser(fn() => 'oh sorry');
+
+    dump($chance->choose());
+
+    // ----return once------
+    // return once();
 });
