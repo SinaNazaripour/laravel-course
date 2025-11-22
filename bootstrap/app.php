@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AliasParamsMiddleware;
+use App\Http\Middleware\LocaleMiddleware;
 use App\Http\Middleware\SayHelloMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'aliastest.midlleware' => AliasParamsMiddleware::class
         ]);
+
+        // real localization step 4
+
+        $middleware->web(append: LocaleMiddleware::class); # middle ware groups
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

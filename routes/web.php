@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\InvokableController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PhotoCommentsController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\TestMwController;
@@ -764,4 +765,33 @@ Route::get('/miscellaneous', function () {
 
     // ----return once------
     // return once();
+});
+
+
+// |----------------
+// |----Localization
+// |----------------
+Route::get('/localization/{locale?}', [LocaleController::class, 'locale']);
+
+// |----------------
+// |----Localization in real application step 1
+// |----------------
+
+Route::prefix('{locale?}')->group(function () {
+    Route::get('address-1', function () {
+        return __('hello :name', ['name' => 'akbar']) . route("localized-route-2");
+    })->name('localized-route-1');
+    Route::get('address-2', function () {
+        return __('hello :name', ['name' => 'mmd']) . route("localized-route-1");
+    })->name('localized-route-2');
+});
+
+// |----------------
+// |----Localization in real application step 2
+// |----------------
+
+Route::get('/choose-languge/{locale}', function (Request $request, $locale = 'en') {
+    $request->session()->put('app_locale', $locale);
+
+    return back();
 });
