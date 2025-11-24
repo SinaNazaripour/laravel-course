@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ViewController;
 use App\Http\Middleware\BeforeAfterMiddleware;
 use App\Http\Middleware\ExampleMiddleware;
+use App\Http\Requests\CustomRequest;
 use App\Models\User;
 use App\Services\ExampleInterface;
 use App\Services\ExampleService1;
@@ -794,4 +795,84 @@ Route::get('/choose-languge/{locale}', function (Request $request, $locale = 'en
     $request->session()->put('app_locale', $locale);
 
     return back();
+})->name('setlocale');
+
+
+// |----------------
+// |----Form & Validation
+// |----------------
+
+Route::get('/validation', function () {
+    return view('validation.form');
 });
+
+Route::post('/validation', function (Request $request) {
+    // dd($request->input());
+    // $request->validate(['email' => 'email|unique:users,name_of_collumn']); #validate method redirects automaticly with old vlaue when form is not valid 
+    $request->validate([
+        'email' => 'email|unique:users,name_of_collumn',
+        "title" => 'bail|required|string|max:10', #|fakeruleToTestBailRule bail rule at first helps to first fail and not check all rules 
+        //  uploaded file validation
+        // "photo" => "required|image",
+        // "photo" => "mimetypes:image/jpeg",
+        "photo" => "extensions:jpg,png|image",
+        // -------------custom validation-----------
+        "custom" => ['required', function (string $attribute, mixed $value, Closure $fail) {
+            if ($value !== 'custom') {
+                // $fail("can not pass {$value} as {$attribute}"); #to error in form 
+
+                // Error translate
+                $fail("validation.custom_rule")->translate(["name" => $attribute], 'fa'); # we have to write this error key(custom_rule) in lang/validation.php for all langs 
+            }
+        }],
+
+        // -------------validation afield based on another field------------------
+        "payment" => "required",
+        "card_number" => "required_if:payment,cc",
+        //  validating password and date
+
+        "published_at" => "nullable|date",
+        "start_date" => "required|date|after:tomorrow",
+        // "password" => "current_password",
+        "v_01" => "required"
+
+        // ----------------------size rule-----------------
+
+        // "string"=>"size:10"=>means chars should be 10
+        // "integer"=>"size:10" field==10
+        // "file"=>"size:10"=>means size of file should be 10kb
+        // "array"=>"size:10"=>means array_count should be 10
+
+    ]);
+
+    dd($request->input());
+});
+
+// |----------------
+// |----json requests validation
+// |----------------
+// request with content type=apllication/json accepts="Application/json" body json  
+Route::post('/json-validation', function (Request $request) {
+    if ($request->has('author')) {
+        $request->validate([
+            'author.name' => 'required|string|max:10'
+
+        ]);
+        return "request is valid ";
+    };
+
+    return " data not sent!";
+})->withoutMiddleware([Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
+
+
+// |----------------
+// |----custom Request classes
+// |----------------
+
+Route::post('/custom-request', function (CustomRequest $request) {
+    if ($request->validated()) {
+        return $request;
+    }
+
+    return "not valid";
+})->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
