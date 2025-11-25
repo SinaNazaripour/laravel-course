@@ -23,6 +23,7 @@ use Illuminate\support\Arr;
 use Illuminate\Support\Benchmark;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Lottery;
 use Illuminate\Support\Number;
 use Psy\Command\DumpCommand;
@@ -869,10 +870,32 @@ Route::post('/json-validation', function (Request $request) {
 // |----custom Request classes
 // |----------------
 
-Route::post('/custom-request', function (CustomRequest $request) {
+Route::post('/custom-request/{optionalParameter?}', function (CustomRequest $request) {
     if ($request->validated()) {
         return $request;
     }
 
     return "not valid";
 })->withoutMiddleware(Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
+
+
+// |----------------
+// |---- handle multiple forms in one page and one function
+// |----------------
+
+Route::get('/multiple-forms', fn() => view('validation.multipleForm'));
+
+Route::post('/multiple-forms', function (Request $request) {
+    if ($request->has('formOne')) {
+        // $request->validate(['firstFormField' => "required"]);#not works
+        $firstFormValidator = Validator::make($request->all(), ['firsFormField' => "required"]);
+        if ($firstFormValidator->fails()) {
+            return redirect()->back()->withErrors($firstFormValidator, "formOne");
+        } else {
+            dump($request->input());
+        }
+        dump('request one sent');
+    } elseif ($request->has('formTwo')) {
+        dump('request Two sent');
+    }
+});
