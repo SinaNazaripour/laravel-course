@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\support\Arr;
 use Illuminate\Support\Benchmark;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
@@ -898,4 +899,29 @@ Route::post('/multiple-forms', function (Request $request) {
     } elseif ($request->has('formTwo')) {
         dump('request Two sent');
     }
+});
+
+
+
+// |----------------
+// |---- Logging
+// |----------------
+
+Route::get('/logging', function () {
+    // Log::info(" this is my info log message");
+    // create custom log
+    // Log::channel("myLog")->emergency(" this is my emergeny log message");
+    // Log::channel("myLog")->alert(" this is my alert log message");
+    // Log::channel("myLog")->critical(" this is my critical log message");
+    // Log::channel("myLog")->error(" this is my error log message");
+    // Log::channel("myLog")->warning(" this is my warning log message");
+    // Log::channel("myLog")->notice(" this is my notice log message"); #this log will not be written in logs ile becuse the level of our channel is warning and each log that lelev uus under this not be written!
+    // Log::channel("myLog")->info(" this is my info log message");
+    // Log::channel("myLog")->debug(" this is my debug log message");
+
+    Log::stack(['single', 'myLog'])->emergency("to a couple of channels");
+
+
+
+    return "ok";
 });
