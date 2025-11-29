@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\CustomException;
 use App\Http\Controllers\InvokableController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PhotoCommentsController;
@@ -14,6 +15,7 @@ use App\Models\User;
 use App\Services\ExampleInterface;
 use App\Services\ExampleService1;
 use App\Services\NotificationDispatcher;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Crypt;
@@ -924,4 +926,53 @@ Route::get('/logging', function () {
 
 
     return "ok";
+});
+
+
+// |----------------
+// |---- Errors
+// |----------------
+
+// builtin excetions handling
+
+
+Route::get("/form-exception-handling", fn() => view('test.views.exceptionHandlingView'));
+
+// Route::post("/form-exception-handling", function (Request $request) {
+//     try {
+//         return User::findOrFail($request->input('user', 1));
+//     } catch (\Throwable $error) {
+//         return back()->withError($error->getMessage())->withInput();
+//     }
+// });
+//  ----or using repository pattern----
+Route::post("/form-exception-handling", function (Request $request) {
+    $userRepository = new class {
+        public function getUser($id)
+        {
+            $user = User::find($id);
+
+            if (!$user) {
+                throw new ModelNotFoundException("user not found");
+            }
+        }
+    };
+    try {
+        $user = $userRepository->getUser($request->input('user'));
+    } catch (\Throwable $error) {
+        return back()->withError($error->getMessage())->withInput();
+    }
+    return $user;
+});
+
+// |----------------
+// |---- Custom Exception -> php artisan make:exception
+// |----------------
+
+Route::get("/custom-exception", function () {
+    $missingData = null;
+    if (!$missingData) {
+        throw new CustomException("وای وای");
+        // also we can use report($exception) when we not allowed to throw!
+    }
 });

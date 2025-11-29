@@ -1,11 +1,13 @@
 <?php
 
+use App\Exceptions\CustomException;
 use App\Http\Middleware\AliasParamsMiddleware;
 use App\Http\Middleware\LocaleMiddleware;
 use App\Http\Middleware\SayHelloMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Log;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -25,5 +27,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: LocaleMiddleware::class); # middle ware groups
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // like in exception
+        $exceptions->report(function (CustomException $e) {
+            Log::channel('myLog', $e->getMessage());
+        });
     })->create();
