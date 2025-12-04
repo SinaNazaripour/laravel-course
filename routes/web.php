@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\support\Arr;
 use Illuminate\Support\Benchmark;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,8 @@ use Psy\Command\DumpCommand;
 use Ramsey\Collection\Collection;
 
 use Illuminate\Support\Str;
+
+
 
 Route::get('/home/{name?}', function ($name) {
     return view('welcome')->with('name', $name);
@@ -202,7 +205,7 @@ Route::get('/hash-encryption/{text}', function ($text) {
 // Route::resource('photo', PhotoController::class);
 // Route::resource('photo', PhotoController::class)->only(['show', 'index']);#----->only specified methods
 // Route::resource('photo', PhotoController::class)->except(['show', 'index']);#----->not specified methods
-Route::apiResource('photo', PhotoController::class); #only reqired for api except any method that render html file
+Route::apiResource('photo', PhotoController::class); #only required for api except any method that render html file
 
 // |----------------------
 // |----Invokable controllers
@@ -337,7 +340,7 @@ Route::get('/before-after', function () {
 })->middleware(BeforeAfterMiddleware::class);
 
 // |----------------------
-// |----define middleware in controlle with implementing hasmiddleware interface
+// |----define middleware in controller with implementing hasmiddleware interface
 // |----------------
 Route::resource('/middleware-in-controller', TestMwController::class);
 
@@ -386,7 +389,7 @@ Route::match(['get', 'post'], '/request/basics', function (Request $request) {
         dump($request->fullUrl());
 
         // for speceific parameter
-        dump($request->query('a', 'defaul'));
+        dump($request->query('a', 'default'));
     }
 })->name('request.basics');
 
@@ -426,7 +429,7 @@ Route::post('request/header-and-token', function (Request $request) {
 
 Route::post("request/input-test", function (Request $request) {
     if ($request->expectsJson()) {
-        dump($request->input('user.name'));
+        return response()->json(["name" => $request->input('user.name')]);
     } elseif ($request->accepts(['text/html'])) {
         // dump($request->input('name'));
 
@@ -446,7 +449,7 @@ Route::post('request/file', function (Request $request) {
     $name = $request->file('photo')->getClientOriginalName();
     // $type=$request->file('photo')->getClientMimeType()
     // $extension=$request->file('photo')->getClientOriginalExtension()
-    // $name=$request->file('photo')->getClientOriginalPath()
+    // $path=$request->file('photo')->getClientOriginalPath()
 
     // __________storage________
     // $path = $request->photo->store('images');
@@ -712,7 +715,7 @@ Route::get('/helpers-string/{text?}', function (string $text = 'sample text') {
     dump(Str::plural('go')); #to pluralize 
     dump(Str::singular('')); #to singular
     dump(Str::slug('go to room')); #to slugify
-    dump(Str::reverse('go to room')); #to slugify
+    dump(Str::reverse('go to room')); #to reverse  
 });
 
 // |----------------
@@ -975,4 +978,25 @@ Route::get("/custom-exception", function () {
         throw new CustomException("وای وای");
         // also we can use report($exception) when we not allowed to throw!
     }
+});
+
+
+
+// |----------------
+// |---- Cache
+// |----------------
+Route::get('/cache-basics', function () {
+    // put data in cache
+    // Cache::put('10_secound_available', 'value_of_cache', $secounds = 10);
+    #-----or
+    // Cache::put('10_secound_available', 'value_of_cache', now()->addSeconds(4));
+
+    // put with custom driver
+    // Cache::store('array')->put('array', 'array cache', $secounds = 10);
+
+    // get data from cache
+    $data = Cache::get('10_secound_available', "default");
+    dump($data);
+
+    // remember cache
 });

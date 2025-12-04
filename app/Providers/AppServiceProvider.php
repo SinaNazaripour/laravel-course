@@ -44,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
 
         // so like routes wwe can use closures!
         View::composer(['test.views.composertest'], function ($view) {
-            $view->with('datakey', 'closue');
+            $view->with('datakey', 'closuer');
         }); #=>['*'] for all blade templates in first array arg
     }
 }

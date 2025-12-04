@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -24,11 +25,17 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // real localization step 4
 
-        $middleware->web(append: LocaleMiddleware::class); # middle ware groups
+        $middleware->web(append: LocaleMiddleware::class); # middleware groups
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // like in exception
-        $exceptions->report(function (CustomException $e) {
-            Log::channel('myLog', $e->getMessage());
-        });
+        // // like in exception
+        // $exceptions->report(function (CustomException $e) {
+        //     Log::channel('myLog', $e->getMessage());
+        // });
+
+        // // and about render like report
+
+        //  $exceptions->render(function (CustomException $e,Request $request) {
+        //     return view...
+        // });
     })->create();
