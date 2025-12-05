@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Lottery;
 use Illuminate\Support\Number;
@@ -1021,4 +1022,44 @@ Route::middleware("cache.headers:public;max_age=2628000;etag")->group(function (
     Route::get('/http-cache', function () {
         return response("http-cache");
     });
+});
+
+
+
+// |----------------
+// |---- file system
+// |----------------
+
+// --------------put content-----------
+
+Route::get('file/put/{content?}', function (string|int|null $content = null) {
+    if ($content) {
+        // Storage::put('fileSystem/file.txt', "content one{$content}");
+        // or another disk
+        Storage::disk('public')->put('fileSystem/file.txt', "content one{$content}");
+        // -also we can use more methods
+        Storage::disk('public')->prepend('fileSystem/file.txt', "prepend{$content}");
+        Storage::disk('public')->append('fileSystem/file.txt', "append{$content}");
+
+        // -----get contents or download files----
+        $content = Storage::disk('public')->get('fileSystem/file.txt');
+        // dump($content);
+        return  Storage::disk('public')->download('fileSystem/file.txt');
+        // copy move delete
+        // $res = Storage::disck('public')->copy("fileSystem/file.txt", "fileSystem/fileCopy.txt"); #file will be copied and $res is true or false
+        // $res = Storage::disck('public')->move("fileSystem/file.txt", "fileSystem/fileCopy.txt"); #file will be moved and $res is true or false
+        // $res = Storage::disck('public')->delete("fileSystem/file.txt"); #file will be deleted and $res is true or false
+
+
+    }
+    return "content not valid";
+});
+
+//------------file properties-----------
+
+Route::get("/file/properties", function () {
+    // return Storage::disk('public')->mimeType('fileSystem/file.txt');
+    // return Storage::disk('public')->size('fileSystem/file.txt');#kb
+    // return Storage::disk('public')->path('fileSystem/file.txt');#absolute path
+    return asset(('storage/fileSystem/file.txt')); #link to show you have to ->php artisan storage:link
 });
