@@ -1044,7 +1044,7 @@ Route::get('file/put/{content?}', function (string|int|null $content = null) {
         // -----get contents or download files----
         $content = Storage::disk('public')->get('fileSystem/file.txt');
         // dump($content);
-        return  Storage::disk('public')->download('fileSystem/file.txt');
+        // return  Storage::disk('public')->download('fileSystem/file.txt');
         // copy move delete
         // $res = Storage::disck('public')->copy("fileSystem/file.txt", "fileSystem/fileCopy.txt"); #file will be copied and $res is true or false
         // $res = Storage::disck('public')->move("fileSystem/file.txt", "fileSystem/fileCopy.txt"); #file will be moved and $res is true or false
@@ -1063,3 +1063,15 @@ Route::get("/file/properties", function () {
     // return Storage::disk('public')->path('fileSystem/file.txt');#absolute path
     return asset(('storage/fileSystem/file.txt')); #link to show you have to ->php artisan storage:link
 });
+
+// |----------------
+// |---- console commands
+// |----------------
+
+//  php artisan
+// php artisan tinker
+// php optimize/cache/route/config:cleare/cache
+// php artisan down/up --secret=ksdjfhkjfds
+// php artisan make:class or trait
+// php artisan stub:publish
+// php artisan make:command
