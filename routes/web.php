@@ -996,7 +996,29 @@ Route::get('/cache-basics', function () {
 
     // get data from cache
     $data = Cache::get('10_secound_available', "default");
-    dump($data);
+    dump($data); #this can be replaced with cache($key,$default) helper
 
     // remember cache
+    // $value = Cache::remember("remember", $secounds = 12, function () {
+    //     dump('callback of remember is executed!');
+    //     return "value of remember cache";
+    // });
+    // get method have call  back but not store in cache
+    $value = Cache::get("remember", function () {
+        dump('this message is seen untill we have not this key in cache');
+        return "value of remember cache";
+    });
+    dump($value);
+
+    // --delete data from cache--
+    Cache::forget("reza");
+    // Cache::flush();#delete entire cache
+
+});
+
+// -------------------->HTTP Cache<-------------
+Route::middleware("cache.headers:public;max_age=2628000;etag")->group(function () {
+    Route::get('/http-cache', function () {
+        return response("http-cache");
+    });
 });
