@@ -51,11 +51,17 @@ return [
     */
 
     'channels' => [
+        "mail" => [
+            'driver' => 'single',
+            'path' => storage_path('logs/mail/mail.log'),
+            'level' => env('LOG_LEVEL', 'notice'),
+            'replace_placeholders' => true,
+        ],
 
         "myLog" => [
             "driver" => 'daily',
             'path' => storage_path('logs/custom.log'),
-            'level' => "warning",
+            'level' => "debug",
             'days' => env('LOG_DAILY_DAYS', 11),
             'replace_placeholders' => true,
         ],

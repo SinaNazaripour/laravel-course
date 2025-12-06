@@ -39,7 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
         //  $exceptions->render(function (CustomException $e,Request $request) {
         //     return view...
         // });
-    })->withSchedule(function (Schedule $schedule) {
+        // })->withSchedule(function (Schedule $schedule) {
         // $schedule->call()->withoutOverlapping()->name('seccound way');
         // $schedule->command('send:mail')->hourly()
         // $schedule->exec('////.js',);

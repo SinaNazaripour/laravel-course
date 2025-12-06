@@ -11,6 +11,7 @@ use App\Http\Controllers\ViewController;
 use App\Http\Middleware\BeforeAfterMiddleware;
 use App\Http\Middleware\ExampleMiddleware;
 use App\Http\Requests\CustomRequest;
+use App\Mail\Hello;
 use App\Models\User;
 use App\Services\ExampleInterface;
 use App\Services\ExampleService1;
@@ -25,6 +26,7 @@ use Illuminate\support\Arr;
 use Illuminate\Support\Benchmark;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -1102,4 +1104,16 @@ Route::get("process/synchronous", function () {
 
 
     return $process->output();
+});
+
+
+// |----------------
+// |----  Email 
+// |----------------
+
+Route::get('/email/{to?}', function ($to) {
+    // Mail::to([$to])->send(new Hello()); #->php artisan make:mail
+    Mail::mailer('log')->to([$to])->cc($to)->bcc($to)->locale('fa')
+        // ->queue(new Hello())
+        ->send(new Hello());
 });
