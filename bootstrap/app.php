@@ -9,6 +9,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Schedule;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -38,4 +39,8 @@ return Application::configure(basePath: dirname(__DIR__))
         //  $exceptions->render(function (CustomException $e,Request $request) {
         //     return view...
         // });
+    })->withSchedule(function (Schedule $schedule) {
+        // $schedule->call()->withoutOverlapping()->name('seccound way');
+        // $schedule->command('send:mail')->hourly()
+        // $schedule->exec('////.js',);
     })->create();
