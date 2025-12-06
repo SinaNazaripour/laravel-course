@@ -25,6 +25,7 @@ use Illuminate\support\Arr;
 use Illuminate\Support\Benchmark;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -1075,3 +1076,30 @@ Route::get("/file/properties", function () {
 // php artisan make:class or trait
 // php artisan stub:publish
 // php artisan make:command
+
+// |----------------
+// |---- Process object and os commands
+// |----------------
+
+Route::get("process/asynchronous", function () {
+    $process = Process::start("git status -s");
+
+    while ($process->running()) {
+        once(function () {
+            echo 'running...';
+        });
+    }
+
+    $res = $process->wait();
+
+    return $res->output();
+});
+
+Route::get("process/synchronous", function () {
+    $process = Process::run("git status -s");
+    // Process::timeout()->run();
+    // Process::forever()->run();
+
+
+    return $process->output();
+});
